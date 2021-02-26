@@ -1,0 +1,104 @@
+<script>
+    const resultsNav = document.getElementById("resultsNav");
+    const favoritesNav = document.getElementById("favoritesNav");
+    const imagesContainer = document.querySelector(".images-container");
+    const loader = document.querySelector(".loader");
+
+    const apiUrl = "<%= URL %>&count=10"
+    let resultsArray = [];
+
+    function updateDOM() {
+
+        //create the HTML elments for all the results arrived through the API
+        resultsArray.forEach((result) => {
+
+            //Card container
+            const card = document.createElement("div");
+            card.classList.add("card")
+            //Link 
+            const link = document.createElement('a');
+            link.href = result.hdurl;
+            link.title = 'View Full Image';
+            //open the link in new tab
+            link.target = "_blank";
+
+            //Image 
+            const image = document.createElement("img")
+            image.src = result.url;
+            image.alt = "NASA picture of the day";
+            image.loading = "lazy";
+            image.classList.add("car-img-top");
+
+            //Card-body
+            const cardBody = document.createElement("div");
+            cardBody.classList.add("card-body");
+
+            //Card title
+            const cardTitle = document.createElement("h5");
+            cardTitle.classList.add("card-title");
+            cardTitle.textContent = result.title;
+
+
+            //Card text
+            const cardText = document.createElement("p");
+            cardText.classList.add("card-text");
+            cardText.textContent = result.explanation;
+
+            //Foter container
+            const footer = document.createElement("small");
+            footer.classList.add("text-muted");
+
+            //Date
+            const date = document.createElement("strong");
+            date.textContent = result.date;
+
+            //Copyright
+            const copyrightResult = result.copyright === undefined ? "" : result.copyright;
+            const copyright = document.createElement("strong");
+            copyright.textContent = " " + copyrightResult
+
+            //Append
+            footer.append(date, copyright);
+            cardBody.append(cardTitle, cardText, footer);
+            link.appendChild(image);
+            card.append(link, cardBody);
+            imagesContainer.appendChild(card);
+
+            console.log("Card is: " + card);
+
+        });
+
+    }
+    //Setup an asynchronous fetch request
+    // Get 10 images from NASA API
+    async function getNasaImages() {
+
+        //show loader
+        loader.classList.remove("hidden")
+
+        try {
+
+            //await the results of the fetch request, and we pass in the apiUrl
+            const response = await fetch(apiUrl);
+            //convert the response to JSON format ant save it to the resultsArray 
+            resultsArray = await response.json();
+            //resultsArray=await JSON.parse(response)
+            console.log(resultsArray);
+            updateDOM();
+
+        } catch (error) {
+            //Catch error
+        }
+        //scroll to the top when the page loaded
+        window.scrollTo({
+            top: 0,
+            behavior: "instant"
+        })
+        //Remove the loader when the page loaded
+        loader.classList.add("hidden")
+    }
+
+
+
+    getNasaImages()
+</script>
